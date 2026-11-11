@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kaartenkluis</title>
+<meta name="theme-color" content="#0b0d17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kaartenkluis">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="brand-mark" aria-hidden="true"></span>Kaartenkluis</div>
+  <nav class="tabs" id="tabs">
+    <button data-view="collection" class="active"><span class="ti">▦</span><span>Collectie</span></button>
+    <button data-view="add"><span class="ti">＋</span><span>Toevoegen</span></button>
+    <button data-view="sets"><span class="ti">☰</span><span>Sets</span></button>
+    <button data-view="settings"><span class="ti">⚙</span><span>Beheer</span></button>
+  </nav>
+</header>
+
+<main>
+  <section id="view-collection" class="view active">
+    <div class="stats" id="stats"></div>
+    <div class="toolbar">
+      <input type="search" id="col-search" placeholder="Zoek in je collectie…" autocomplete="off">
+      <select id="col-sort" aria-label="Sorteren">
+        <option value="recent">Laatst toegevoegd</option>
+        <option value="value">Waarde (hoog → laag)</option>
+        <option value="name">Naam</option>
+        <option value="set">Set en nummer</option>
+        <option value="rarity">Zeldzaamheid</option>
+      </select>
+    </div>
+    <div class="grid" id="col-grid"></div>
+    <div class="empty" id="col-empty" hidden>
+      <div class="empty-pack" aria-hidden="true"></div>
+      <h2>Je kluis is nog leeg</h2>
+      <p>Zoek kaarten op, stop ze in een pakje en scheur het open.</p>
+      <button class="btn primary" data-goto="add">Eerste kaarten toevoegen</button>
+    </div>
+  </section>
+
+  <section id="view-add" class="view">
+    <h1>Kaarten toevoegen</h1>
+    <p class="sub">Tik op een kaart om hem in je pakje te stoppen. Open het pakje om ze aan je collectie toe te voegen.</p>
+    <form class="toolbar" id="add-form">
+      <input type="search" id="add-search" placeholder="Naam van de kaart, bv. Charizard" autocomplete="off">
+      <button class="btn primary" type="submit">Zoek</button>
+    </form>
+    <div class="status" id="add-status"></div>
+    <div class="grid" id="add-grid"></div>
+    <div class="center"><button class="btn" id="add-more" hidden>Meer resultaten</button></div>
+  </section>
+
+  <section id="view-sets" class="view">
+    <div id="sets-list-wrap">
+      <h1>Sets</h1>
+      <div class="toolbar">
+        <input type="search" id="sets-search" placeholder="Zoek een set…" autocomplete="off">
+        <label class="check"><input type="checkbox" id="sets-mine"> Alleen mijn sets</label>
+      </div>
+      <div class="status" id="sets-status"></div>
+      <div class="setlist" id="sets-list"></div>
+    </div>
+    <div id="set-detail" hidden>
+      <button class="btn ghost" id="set-back">← Alle sets</button>
+      <div class="set-head" id="set-head"></div>
+      <div class="chips" id="set-filter">
+        <button data-f="all" class="active">Alles</button>
+        <button data-f="have">Heb ik</button>
+        <button data-f="miss">Mis ik nog</button>
+      </div>
+      <div class="status" id="set-status"></div>
+      <div class="grid" id="set-grid"></div>
+    </div>
+  </section>
+
+  <section id="view-settings" class="view">
+    <h1>Beheer</h1>
+    <div class="panel">
+      <h3>Prijzen</h3>
+      <p>Waardes zijn Cardmarket-trendprijzen (EUR) via TCGdex: een schatting, geen taxatie. Staat en variant van je kaart tellen niet mee.</p>
+      <button class="btn" id="btn-prices">Prijzen verversen</button>
+      <span class="status inline" id="prices-status"></span>
+    </div>
+    <div class="panel">
+      <h3>Kaarttaal</h3>
+      <p>In welke taal kaarten en sets worden opgezocht.</p>
+      <select id="set-lang">
+        <option value="en">Engels</option>
+        <option value="nl">Nederlands</option>
+        <option value="de">Duits</option>
+        <option value="fr">Frans</option>
+        <option value="ja">Japans</option>
+      </select>
+    </div>
+    <div class="panel">
+      <h3>Back-up en apparaten</h3>
+      <p>Je collectie staat op dit apparaat. Met een back-upbestand zet je hem over naar je iPad of iPhone.</p>
+      <button class="btn" id="btn-export">Back-up downloaden</button>
+      <label class="btn">Back-up terugzetten<input type="file" id="in-json" accept="application/json,.json" hidden></label>
+    </div>
+    <div class="panel">
+      <h3>CSV importeren <span class="tag">experimenteel</span></h3>
+      <p>Voor een export uit Collectr of een eigen lijst. Kolommen die herkend worden: naam, set, kaartnummer en aantal. Kaarten worden op set + nummer gematcht.</p>
+      <label class="btn">CSV kiezen<input type="file" id="in-csv" accept=".csv,text/csv" hidden></label>
+      <div class="status" id="csv-status"></div>
+    </div>
+    <div class="panel danger">
+      <h3>Alles wissen</h3>
+      <button class="btn" id="btn-wipe">Collectie leegmaken</button>
+    </div>
+  </section>
+</main>
+
+<button class="fab" id="fab" hidden><span class="fab-pack" aria-hidden="true"></span><span id="fab-label">Pakje</span></button>
+
+<div class="modal" id="modal" hidden><div class="modal-bg" data-close></div><div class="modal-box" id="modal-box"></div></div>
+<div class="opener" id="opener" hidden></div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>
